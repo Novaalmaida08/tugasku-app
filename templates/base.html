@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block title %}TugasKu{% endblock %} · TugasKu</title>
+<meta name="theme-color" content="#0b1020">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}catch(e){}</script>
+</head>
+<body class="{{ 'app' if user else 'guest' }}">
+<div class="bg-blobs"><span></span><span></span><span></span></div>
+
+{% if user %}
+{% set ep = request.endpoint or '' %}
+<aside class="sidebar">
+  <a class="brand" href="{{ url_for('dashboard') }}"><span class="logo">T</span><b>Tugas<em>Ku</em></b></a>
+  <nav class="nav">
+    <a href="{{ url_for('dashboard') }}" class="{{ 'on' if ep=='dashboard' }}"><i>🏠</i>Dashboard</a>
+    <a href="{{ url_for('courses') }}" class="{{ 'on' if ep in ('courses','course_view') }}"><i>📁</i>Mata Kuliah</a>
+    <a href="{{ url_for('tasks') }}" class="{{ 'on' if ep=='tasks' }}"><i>✅</i>Tugas &amp; Deadline</a>
+    <a href="{{ url_for('schedule') }}" class="{{ 'on' if ep=='schedule' }}"><i>📅</i>Jadwal Kuliah</a>
+    <a href="{{ ABSENSI_URL }}" target="_blank" rel="noopener" data-plain><i>✍️</i>Absensi Great ↗</a>
+  </nav>
+  <div class="userbox">
+    <div class="avatar">{{ user.name[:1]|upper }}</div>
+    <div class="uinfo"><b>{{ user.name }}</b><small>{{ user.npm or user.email }}</small></div>
+    <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="icon-btn" title="Keluar">⎋</button></form>
+  </div>
+</aside>
+
+<div class="content">
+  <header class="topbar">
+    <a class="brand mobile-only" href="{{ url_for('dashboard') }}"><span class="logo">T</span><b>Tugas<em>Ku</em></b></a>
+    <h2 class="page-title">{% block heading %}{% endblock %}</h2>
+    <div class="top-actions">
+      <button class="icon-btn" id="theme" title="Ganti tema">🌓</button>
+      <div class="bell-wrap">
+        <button class="icon-btn" id="bell" title="Notifikasi">🔔<span class="badge-dot" id="bell-badge" hidden>0</span></button>
+        <div class="notif-panel" id="notif-panel">
+          <div class="notif-head"><b>Pengingat</b><button class="btn sm ghost" id="enable-push">Aktifkan notifikasi browser</button></div>
+          <div id="notif-list" class="notif-list"><p class="muted pad">Memuat…</p></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="page" id="page">{% block content %}{% endblock %}</main>
+</div>
+
+<nav class="bottomnav">
+  <a href="{{ url_for('dashboard') }}" class="{{ 'on' if ep=='dashboard' }}"><i>🏠</i><span>Home</span></a>
+  <a href="{{ url_for('courses') }}" class="{{ 'on' if ep in ('courses','course_view') }}"><i>📁</i><span>Kuliah</span></a>
+  <button class="fab" data-open="modal-task" aria-label="Tambah tugas">＋</button>
+  <a href="{{ url_for('tasks') }}" class="{{ 'on' if ep=='tasks' }}"><i>✅</i><span>Tugas</span></a>
+  <a href="{{ url_for('schedule') }}" class="{{ 'on' if ep=='schedule' }}"><i>📅</i><span>Jadwal</span></a>
+</nav>
+{% include "_modals.html" %}
+{% else %}
+<main class="page auth-page" id="page">{% block auth %}{% endblock %}</main>
+{% endif %}
+
+<div class="toasts" id="toasts"></div>
+<script>window.FLASH = {{ get_flashed_messages(with_categories=true)|tojson }};</script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Jadwal{% endblock %}
+{% block heading %}Jadwal Kuliah{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <div class="tabs" data-tabs>
+    {% for d in DAYS %}
+    <button data-tab="{{ loop.index0 }}" class="{{ 'on' if loop.index0==today_idx }}">{{ d[:3] }}{% if by_day[loop.index0] %}<em>{{ by_day[loop.index0]|length }}</em>{% endif %}</button>
+    {% endfor %}
+  </div>
+  <button class="btn primary" data-open="modal-schedule">＋ Jadwal</button>
+</div>
+{% for d in DAYS %}
+{% set di = loop.index0 %}
+<section class="panel card {{ 'on' if di==today_idx }}" data-panel="{{ di }}">
+  <div class="card-head"><h3>{{ d }}{% if di==today_idx %} <span class="badge ok">Hari ini</span>{% endif %}</h3></div>
+  <div class="stagger">
+  {% for s in by_day[di] %}
+    <div class="slot" style="--c:{{ s.color }}">
+      <div class="slot-time">{{ s.start_time }}<small>{{ s.end_time }}</small></div>
+      <div class="task-main"><strong>{{ s.course_name }}</strong><small>📍 {{ s.room or '-' }}{% if s.lecturer %} · {{ s.lecturer }}{% endif %}</small></div>
+      <form method="post" action="{{ url_for('schedule_delete', sid=s.id) }}" data-confirm="Hapus jadwal ini?"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="icon-btn ghost-danger">🗑</button></form>
+    </div>
+  {% else %}<p class="empty">Tidak ada kuliah di hari {{ d }} 🎈</p>{% endfor %}
+  </div>
+</section>
+{% endfor %}
+{% endblock %}

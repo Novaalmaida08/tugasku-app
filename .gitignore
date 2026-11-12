@@ -1,0 +1,4 @@
+tugasku.db
+uploads/
+.secret_key
+__pycache__/

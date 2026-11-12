@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "_macros.html" import task_row with context %}
+{% block title %}Dashboard{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+{% block content %}
+<section class="hero-card">
+  <div>
+    <p class="muted">{{ today_label }}</p>
+    <h1>Halo, {{ user.name.split()[0] }} 👋</h1>
+    <p class="muted">
+      {% if stats.overdue %}Ada {{ stats.overdue }} tugas yang terlambat. Yuk kejar!
+      {% elif stats.pending %}Kamu punya {{ stats.pending }} tugas aktif.
+      {% else %}Tidak ada tugas aktif, santai dulu 🎉{% endif %}
+    </p>
+  </div>
+  <div class="hero-actions">
+    <button class="btn primary" data-open="modal-task">＋ Tugas</button>
+    <a class="btn ghost" href="{{ ABSENSI_URL }}" target="_blank" rel="noopener" data-plain>✍️ Absensi Great</a>
+  </div>
+</section>
+
+<section class="stats stagger">
+  <div class="stat"><span>📁</span><b>{{ stats.courses }}</b><small>Mata kuliah</small></div>
+  <div class="stat"><span>🕒</span><b>{{ stats.pending }}</b><small>Tugas aktif</small></div>
+  <div class="stat warn"><span>⛔</span><b>{{ stats.overdue }}</b><small>Terlambat</small></div>
+  <div class="stat ok"><span>✅</span><b>{{ stats.done }}</b><small>Selesai</small></div>
+</section>
+
+<section class="two">
+  <div class="card">
+    <div class="card-head"><h3>📅 Jadwal Hari Ini</h3><a href="{{ url_for('schedule') }}">Semua</a></div>
+    <div class="stagger">
+    {% for s in today %}
+      <div class="slot {{ 'now' if s.start_time <= now_time <= s.end_time }}" style="--c:{{ s.color }}">
+        <div class="slot-time">{{ s.start_time }}<small>{{ s.end_time }}</small></div>
+        <div><strong>{{ s.course_name }}</strong><small>{{ s.room or 'Ruang -' }}{% if s.lecturer %} · {{ s.lecturer }}{% endif %}</small></div>
+      </div>
+    {% else %}
+      <p class="empty">Tidak ada kuliah hari ini 🎈</p>
+    {% endfor %}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>⏰ Deadline Terdekat</h3><a href="{{ url_for('tasks') }}">Semua</a></div>
+    <div class="stagger">
+    {% for t in upcoming %}{{ task_row(t) }}{% else %}<p class="empty">Belum ada tugas. Tambahkan lewat tombol ＋.</p>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

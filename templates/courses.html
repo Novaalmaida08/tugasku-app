@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Mata Kuliah{% endblock %}
+{% block heading %}Folder Mata Kuliah{% endblock %}
+{% block content %}
+<div class="grid folders stagger">
+  {% for c in rows %}
+  <a class="folder" style="--c:{{ c.color }}" href="{{ url_for('course_view', cid=c.id) }}">
+    <span class="folder-icon">📂</span>
+    <h3>{{ c.name }}</h3>
+    <p class="muted">{{ c.code or 'Tanpa kode' }}{% if c.lecturer %} · {{ c.lecturer }}{% endif %}</p>
+    <div class="chips"><span>🕒 {{ c.pending }} tugas aktif</span><span>📎 {{ c.nfiles }} file</span></div>
+  </a>
+  {% endfor %}
+  <button class="folder new" data-open="modal-course"><span class="plus">＋</span><b>Folder baru</b><small class="muted">Tambah mata kuliah</small></button>
+</div>
+{% endblock %}

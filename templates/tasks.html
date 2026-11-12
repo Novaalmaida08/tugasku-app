@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% from "_macros.html" import task_row with context %}
+{% block title %}Tugas{% endblock %}
+{% block heading %}Tugas &amp; Deadline{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <div class="seg">
+    {% for k,l in [('active','Aktif'),('overdue','Terlambat'),('done','Selesai'),('all','Semua')] %}
+    <a href="{{ url_for('tasks', f=k) }}" class="{{ 'on' if flt==k }}">{{ l }}</a>{% endfor %}
+  </div>
+  <button class="btn primary" data-open="modal-task">＋ Tugas</button>
+</div>
+<div class="card stagger">
+  {% for t in rows %}{{ task_row(t) }}{% else %}<p class="empty">Tidak ada tugas di kategori ini ✨</p>{% endfor %}
+</div>
+{% endblock %}

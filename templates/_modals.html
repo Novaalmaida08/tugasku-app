@@ -1,0 +1,61 @@
+<dialog class="modal" id="modal-course">
+  <form method="post" action="{{ url_for('course_add') }}">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <h3>📁 Folder Mata Kuliah Baru</h3>
+    <label>Nama mata kuliah<input name="name" required maxlength="80" placeholder="Pemrograman Web"></label>
+    <div class="row2">
+      <label>Kode<input name="code" maxlength="20" placeholder="TIF301"></label>
+      <label>Dosen<input name="lecturer" maxlength="80" placeholder="Nama dosen"></label>
+    </div>
+    <label>Warna folder</label>
+    <div class="swatches">
+      {% for c in ['#6366f1','#ec4899','#14b8a6','#f59e0b','#3b82f6','#ef4444','#8b5cf6','#22c55e'] %}
+      <label class="sw" style="--c:{{ c }}"><input type="radio" name="color" value="{{ c }}" {{ 'checked' if loop.first }}><span></span></label>
+      {% endfor %}
+    </div>
+    <div class="modal-actions"><button type="button" class="btn ghost" data-close>Batal</button><button class="btn primary">Buat folder</button></div>
+  </form>
+</dialog>
+
+<dialog class="modal" id="modal-task">
+  {% if my_courses %}
+  <form method="post" action="{{ url_for('task_add') }}">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <h3>✅ Tambah Tugas</h3>
+    <label>Mata kuliah
+      <select name="course_id" required>{% for c in my_courses %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select>
+    </label>
+    <label>Judul tugas<input name="title" required maxlength="120" placeholder="Makalah Bab 2"></label>
+    <label>Deskripsi (opsional)<textarea name="description" rows="3" maxlength="1000"></textarea></label>
+    <label>Deadline<input type="datetime-local" name="deadline" required></label>
+    <div class="modal-actions"><button type="button" class="btn ghost" data-close>Batal</button><button class="btn primary">Simpan</button></div>
+  </form>
+  {% else %}
+  <div class="empty-modal"><h3>Belum ada folder mata kuliah</h3><p class="muted">Buat folder mata kuliah dulu supaya tugas bisa dikelompokkan.</p>
+    <div class="modal-actions"><button class="btn ghost" data-close>Tutup</button><button class="btn primary" data-open="modal-course" data-swap>Buat folder</button></div></div>
+  {% endif %}
+</dialog>
+
+<dialog class="modal" id="modal-schedule">
+  {% if my_courses %}
+  <form method="post" action="{{ url_for('schedule_add') }}">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <h3>📅 Tambah Jadwal Kuliah</h3>
+    <label>Mata kuliah
+      <select name="course_id" required>{% for c in my_courses %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select>
+    </label>
+    <label>Hari
+      <select name="day">{% for d in DAYS %}<option value="{{ loop.index0 }}">{{ d }}</option>{% endfor %}</select>
+    </label>
+    <div class="row2">
+      <label>Mulai<input type="time" name="start_time" required value="08:00"></label>
+      <label>Selesai<input type="time" name="end_time" required value="09:40"></label>
+    </div>
+    <label>Ruangan<input name="room" maxlength="40" placeholder="Lab 2 / R.301"></label>
+    <div class="modal-actions"><button type="button" class="btn ghost" data-close>Batal</button><button class="btn primary">Simpan</button></div>
+  </form>
+  {% else %}
+  <div class="empty-modal"><h3>Belum ada folder mata kuliah</h3><p class="muted">Buat folder mata kuliah dulu sebelum menambah jadwal.</p>
+    <div class="modal-actions"><button class="btn ghost" data-close>Tutup</button><button class="btn primary" data-open="modal-course" data-swap>Buat folder</button></div></div>
+  {% endif %}
+</dialog>

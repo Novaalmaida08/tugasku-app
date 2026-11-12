@@ -1,0 +1,18 @@
+{% macro task_row(t) %}
+{% set u = urgency(t) %}
+<div class="task {{ u }}" style="--c:{{ t.color }}">
+  <form method="post" action="{{ url_for('task_toggle', tid=t.id) }}">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <button class="check" title="Tandai {{ 'belum' if t.done else 'selesai' }}">{{ '✓' if t.done }}</button>
+  </form>
+  <div class="task-main">
+    <strong class="{{ 'strike' if t.done }}">{{ t.title }}</strong>
+    <small><i class="dot"></i>{{ t.course_name }} · {{ t.deadline|fmt_dt }}</small>
+  </div>
+  <span class="badge {{ u }}">{{ 'Selesai' if t.done else rel_time(t.deadline) }}</span>
+  <form method="post" action="{{ url_for('task_delete', tid=t.id) }}" data-confirm="Hapus tugas ini?">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <button class="icon-btn ghost-danger" title="Hapus">🗑</button>
+  </form>
+</div>
+{% endmacro %}

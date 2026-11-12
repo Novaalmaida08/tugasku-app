@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Masuk' if mode=='login' else 'Daftar' }}{% endblock %}
+{% block auth %}
+<div class="auth-wrap">
+  <section class="auth-hero">
+    <a class="brand" href="/"><span class="logo">T</span><b>Tugas<em>Ku</em></b></a>
+    <h1>Semua tugas kuliah,<br><span class="grad">rapi dalam satu tempat.</span></h1>
+    <p class="muted">Folder per mata kuliah, pengingat deadline, jadwal harian, dan akses cepat ke absensi Great.</p>
+    <ul class="feat">
+      <li><i>📁</i> Folder terpisah tiap mata kuliah</li>
+      <li><i>⏰</i> Notifikasi pengingat deadline</li>
+      <li><i>📅</i> Jadwal kuliah per hari</li>
+      <li><i>🎓</i> Terhubung SSO kampus</li>
+    </ul>
+  </section>
+  <section class="auth-card card">
+    <div class="seg">
+      <a href="{{ url_for('login') }}" class="{{ 'on' if mode=='login' }}">Masuk</a>
+      <a href="{{ url_for('register') }}" class="{{ 'on' if mode=='register' }}">Daftar</a>
+    </div>
+    <form method="post" class="form">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      {% if mode == 'register' %}
+      <label>Nama lengkap<input name="name" required maxlength="80" autocomplete="name"></label>
+      <label>NPM (opsional)<input name="npm" maxlength="30" inputmode="numeric"></label>
+      <label>Email<input type="email" name="email" required autocomplete="email"></label>
+      <label>Password (min. 6 karakter)<input type="password" name="password" required minlength="6" autocomplete="new-password"></label>
+      <button class="btn primary block">Buat akun</button>
+      {% else %}
+      <label>Email atau NPM<input name="ident" required autocomplete="username"></label>
+      <label>Password<input type="password" name="password" required autocomplete="current-password"></label>
+      <button class="btn primary block">Masuk</button>
+      {% endif %}
+    </form>
+    <div class="divider"><span>atau</span></div>
+    <a class="btn ghost block" href="{{ url_for('sso_login') }}" data-plain>🎓 Masuk dengan SSO UMC</a>
+  </section>
+</div>
+{% endblock %}

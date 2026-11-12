@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "_macros.html" import task_row with context %}
+{% block title %}{{ c.name }}{% endblock %}
+{% block heading %}<a href="{{ url_for('courses') }}" class="crumb">Mata Kuliah</a> / {{ c.name }}{% endblock %}
+{% block content %}
+<section class="hero-card" style="--c:{{ c.color }}">
+  <div>
+    <span class="folder-icon big">📂</span>
+    <h1>{{ c.name }}</h1>
+    <p class="muted">{{ c.code or 'Tanpa kode' }}{% if c.lecturer %} · {{ c.lecturer }}{% endif %}</p>
+    {% if sched %}<div class="chips">{% for s in sched %}<span>{{ DAYS[s.day] }} {{ s.start_time }}–{{ s.end_time }}</span>{% endfor %}</div>{% endif %}
+  </div>
+  <div class="hero-actions">
+    <button class="btn primary" data-open="modal-task" data-course="{{ c.id }}">＋ Tugas</button>
+    <form method="post" action="{{ url_for('course_delete', cid=c.id) }}" data-confirm="Hapus folder beserta semua tugas dan file di dalamnya?">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="btn danger">Hapus folder</button>
+    </form>
+  </div>
+</section>
+
+<section class="two">
+  <div class="card">
+    <div class="card-head"><h3>✅ Tugas</h3></div>
+    <div class="stagger">{% for t in tasks %}{{ task_row(t) }}{% else %}<p class="empty">Belum ada tugas di folder ini.</p>{% endfor %}</div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>📎 File Tugas</h3></div>
+    <form method="post" enctype="multipart/form-data" action="{{ url_for('upload', cid=c.id) }}" class="upload">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <label class="drop" id="drop"><input type="file" name="file" required hidden><span class="drop-ic">⬆️</span><b id="drop-text">Tarik file ke sini atau klik untuk memilih</b><small class="muted">Maks. 25 MB · pdf, docx, pptx, zip, dll.</small></label>
+      <div class="row2">
+        <select name="task_id"><option value="">Tanpa tugas tertentu</option>{% for t in tasks if not t.done %}<option value="{{ t.id }}">{{ t.title }}</option>{% endfor %}</select>
+        <label class="check-l"><input type="checkbox" name="mark_done" value="1" checked> Tandai tugas selesai</label>
+      </div>
+      <button class="btn primary block">Unggah ke folder</button>
+    </form>
+    <div class="files stagger">
+      {% for f in files %}
+      <div class="file">
+        <span class="file-ic">📄</span>
+        <div class="task-main"><strong>{{ f.original_name }}</strong><small>{{ f.size|fmt_size }}{% if f.task_title %} · {{ f.task_title }}{% endif %} · {{ f.uploaded_at[:10] }}</small></div>
+        <a class="icon-btn" href="{{ url_for('file_download', fid=f.id) }}" data-plain title="Unduh">⬇</a>
+        <form method="post" action="{{ url_for('file_delete', fid=f.id) }}" data-confirm="Hapus file ini?"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="icon-btn ghost-danger">🗑</button></form>
+      </div>
+      {% else %}<p class="empty">Folder masih kosong.</p>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
